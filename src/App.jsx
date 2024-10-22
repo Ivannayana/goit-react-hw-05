@@ -1,21 +1,25 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import Navigation from "./components/Navigation/Navigation";
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const MoviesPage = lazy(() => import("./pages/MoviesPage"));
+const MovieDetailsPage = lazy(() => import("./pages/MovieDetailsPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <div>
-        <nav></nav>
+    <div>
+      <Navigation />
+      <Suspense fallback={<div>Loading...</div>}>
         <Routes>
-          <Route></Route>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/movies" element={<MoviesPage />} />
+          <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      </div>
-    </>
+      </Suspense>
+    </div>
   );
 }
 

@@ -1,0 +1,10 @@
+.container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.link {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
