@@ -1,6 +1,7 @@
 import { useParams, Link, Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import styles from "./MovieDetailsPage.module.css";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
@@ -21,14 +22,18 @@ const MovieDetailsPage = () => {
 
   return (
     <div>
-      <h1>{movie.title}</h1>
+      <h1 className={styles.title}>{movie.title}</h1>
       <img
         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
         alt={movie.title}
       />
       <p>{movie.overview}</p>
-      <Link to="cast">Cast</Link>
-      <Link to="reviews">Reviews</Link>
+      <Link className={styles.components} to="cast">
+        Cast
+      </Link>
+      <Link className={styles.components} to="reviews">
+        Reviews
+      </Link>
 
       <Outlet />
     </div>
