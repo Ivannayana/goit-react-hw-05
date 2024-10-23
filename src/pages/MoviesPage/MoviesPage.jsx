@@ -1,38 +1,56 @@
-import { useState } from "react";
-import axios from "axios";
+import React from "react";
+import { useState, useEffect } from "react";
+import { fetchSearchMovie } from "../../services/fetchVideos";
+import SearchBar from "../../components/SearchBar/SearchBar";
+import { Link, useLocation } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import Loader from "../../components/Loader/Loader";
+import styles from "./MoviesPage.module.css";
 import MovieList from "../../components/MovieList/MovieList";
 
 const MoviesPage = () => {
-  const [query, setQuery] = useState("");
-  const [movies, setMovies] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const movie = searchParams.get("movie") ?? "";
+    if (!movie) {
+      return;
+    }
+    const getSearchMovie = async () => {
+      setLoading(true);
+      try {
+        setLoading(true);
+        setError(false);
+        const data = await fetchSearchMovie(movie);
+        setSearchResults(data);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getSearchMovie();
+  }, [searchParams]);
 
-    axios
-      .get(`https://api.themoviedb.org/3/search/movie?query=${query}`, {
-        headers: {
-          Authorization: "Bearer 9cda16d98a6e510af2decf0d66e8e7d5",
-        },
-      })
-      .then((response) => setMovies(response.data.results))
-      .catch((error) => console.error(error));
+  const onSubmit = (movie) => {
+    setSearchParams({ movie });
   };
 
   return (
     <div>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for movies"
-        />
-        <button type="submit">Search</button>
-      </form>
-      <MovieList movies={movies} />
+      <SearchBar onSubmit={onSubmit} />
+      {loading && <Loader isLoading={loading} />}
+      {error && <p>Error fetching movies</p>}
+      {!loading && !searchParams.get("movie") && (
+        <p className={styles.text}>Please enter your movie search!</p>
+      )}
+
+      <MovieList movies={searchResults} />
     </div>
   );
 };
-
 export default MoviesPage;

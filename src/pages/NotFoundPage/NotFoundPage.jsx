@@ -4,11 +4,10 @@ import styles from "./NotFoundPage.module.css";
 
 const NotFoundPage = () => {
   return (
-    <div className={styles.container}>
-      <h1>404 - Page Not Found</h1>
-      <p>Sorry, the page you are looking for does not exist.</p>
-      <Link to="/" className={styles.link}>
-        Go to Home
+    <div className={styles.box}>
+      No pages was found. Please, go to the
+      <Link to="/">
+        <button className={styles.btn}>Home page</button>
       </Link>
     </div>
   );

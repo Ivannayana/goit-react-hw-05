@@ -1,30 +1,57 @@
-import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { fetchCastByID } from "../../services/fetchVideos";
+import styles from "./MovieCast.module.css";
 
 const MovieCast = () => {
+  const [cast, setCast] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const { movieId } = useParams();
-  const [cast, setCast] = useState([]);
+
+  const defaultImg =
+    "https://dl-media.viber.com/10/share/2/long/vibes/icon/image/0x0/95e0/5688fdffb84ff8bed4240bcf3ec5ac81ce591d9fa9558a3a968c630eaba195e0.jpg";
 
   useEffect(() => {
-    axios
-      .get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
-        headers: {
-          Authorization: "Bearer 9cda16d98a6e510af2decf0d66e8e7d5",
-        },
-      })
-      .then((response) => setCast(response.data.cast))
-      .catch((error) => console.error(error));
+    async function getCastByID() {
+      try {
+        setLoading(true);
+        setError(false);
+        const data = await fetchCastByID(movieId);
+        setCast(data.cast);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getCastByID();
   }, [movieId]);
 
   return (
-    <ul>
-      {cast.map((actor) => (
-        <li key={actor.id}>
-          {actor.name} as {actor.character}
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h2 className={styles.mainText}>Movie Cast</h2>
+      <ul className={styles.list}>
+        {cast && cast.length > 0 ? (
+          cast.map((actor) => (
+            <li className={styles.card} key={actor.cast_id}>
+              <strong>{actor.name}</strong> as {actor.character}
+              <img
+                className={styles.picture}
+                src={
+                  actor.profile_path
+                    ? `https://image.tmdb.org/t/p/w500${actor.profile_path}`
+                    : defaultImg
+                }
+                alt="poster"
+              />
+            </li>
+          ))
+        ) : (
+          <p>No cast information available.</p>
+        )}
+      </ul>
+    </div>
   );
 };
 

@@ -1,3 +1,9 @@
-.list {
+.box {
   text-align: left;
+}
+
+.list {
+  text-decoration: none;
+  list-style: none;
+  font-size: 20px;
 }

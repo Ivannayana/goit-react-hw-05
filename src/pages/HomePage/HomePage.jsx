@@ -1,22 +1,36 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import MovieList from "../../components/MovieList/MovieList";
+import { fetchVideos } from "../../services/fetchVideos";
+import { useEffect, useState } from "react";
+import Loader from "../../components/Loader/Loader";
+import styles from "./HomePage.module.css";
 
 const HomePage = () => {
   const [movies, setMovies] = useState([]);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   useEffect(() => {
-    axios
-      .get("https://api.themoviedb.org/3/trending/movie/day", {
-        headers: {
-          Authorization: "Bearer 9cda16d98a6e510af2decf0d66e8e7d5",
-        },
-      })
-      .then((response) => setMovies(response.data.results))
-      .catch((error) => console.error(error));
+    async function getVideos() {
+      try {
+        setLoading(true);
+        setError(false);
+        const data = await fetchVideos();
+        setMovies(data);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getVideos();
   }, []);
-
-  return <MovieList movies={movies} />;
+  return (
+    <div>
+      {loading && <Loader isLoading={loading} />}
+      <h1 className={styles.title}>Trending today</h1>
+      <MovieList movies={movies} />
+    </div>
+  );
 };
 
 export default HomePage;
